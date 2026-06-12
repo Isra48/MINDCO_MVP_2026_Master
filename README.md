@@ -106,7 +106,7 @@ src/
 
 - Rama principal: **`main`** (única fuente de verdad).
 - **No se commitea directo a `main`.** Cada cambio va en una rama feature → PR → merge.
-- Commits con **Conventional Commits + Gitmoji** en español (ej. `✨ feat(strapi): ...`, `🐛 fix: ...`).
+- Commits con **Conventional Commits + Gitmoji** en español, con el **emoji al final** (ej. `feat(strapi): ... ✨`, `fix: ... 🐛`).
 - El comando **`/sf`** (Claude Code) automatiza: rama feature + commits + push + PR.
   Definición en [`.claude/commands/sf.md`](.claude/commands/sf.md).
 
