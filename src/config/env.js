@@ -50,6 +50,11 @@ export const getSupabaseAnonKey = () => readEnvValue("SUPABASE_ANON_KEY") || "";
 export const isUsingStrapi = () => getContentSource() === "strapi";
 export const isMockSource = () => !isUsingStrapi();
 
+// Bypass de auth SOLO para desarrollo: entra directo al Home sin login real.
+// Apagado por defecto y nunca se respeta fuera de __DEV__ (no llega a producción).
+export const isDevAuthBypass = () =>
+  __DEV__ && readEnvValue("DEV_SKIP_AUTH") === "true";
+
 export const config = {
   strapiUrl: getStrapiUrl(),
   strapiToken: getStrapiToken(),

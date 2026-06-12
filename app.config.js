@@ -35,6 +35,8 @@ export default {
       // Supabase (Auth). La publishable/anon key es pública y segura en el cliente.
       SUPABASE_URL: process.env.SUPABASE_URL || "",
       SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY || "",
+      // Bypass de auth SOLO para desarrollo (entra al Home sin login). Default off.
+      DEV_SKIP_AUTH: process.env.DEV_SKIP_AUTH || "false",
     },
   },
 };
