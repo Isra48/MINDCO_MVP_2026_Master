@@ -10,6 +10,7 @@ import ProfileEditorScreen from "../screens/ProfileEditorScreen";
 import HomeScreen from "../screens/HomeScreen";
 import ClassesScreen from "../screens/ClassesScreen";
 import SettingsScreen from "../screens/SettingsScreen";
+import NotificationsScreen from "../screens/NotificationsScreen";
 import CustomTabBar from "../components/navigation/CustomTabBar";
 
 const RootStack = createNativeStackNavigator();
@@ -61,6 +62,7 @@ function AppStack({ hasProfile }) {
           headerBackTitleVisible: false,
         }}
       />
+      <AppStackNav.Screen name="Notifications" component={NotificationsScreen} />
     </AppStackNav.Navigator>
   );
 }

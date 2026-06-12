@@ -43,6 +43,7 @@ export default function HomeScreen() {
     requestPermissions,
     markPromptSeen,
     scheduleClassNotifications,
+    unreadCount,
   } = useNotifications();
 
   const {
@@ -192,7 +193,23 @@ export default function HomeScreen() {
         </TouchableOpacity>
 
         <Text style={styles.homeTitle}>MindCo</Text>
-        <Feather name="search" size={24} color="#000" />
+
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Notifications")}
+          activeOpacity={0.7}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <View>
+            <Feather name="bell" size={24} color="#000" />
+            {unreadCount > 0 && (
+              <View style={styles.notificationBadge}>
+                <Text style={styles.notificationBadgeText}>
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </Text>
+              </View>
+            )}
+          </View>
+        </TouchableOpacity>
       </View>
 
       {/* Hero */}
@@ -335,6 +352,23 @@ const styles = StyleSheet.create({
     backgroundColor: colors.lightGray,
     alignItems: "center",
     justifyContent: "center",
+  },
+  notificationBadge: {
+    position: "absolute",
+    top: -6,
+    right: -8,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    paddingHorizontal: 4,
+    backgroundColor: colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  notificationBadgeText: {
+    color: colors.white,
+    fontSize: 10,
+    fontWeight: "700",
   },
   sectionTitle: {
     marginLeft: 16,
