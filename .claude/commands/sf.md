@@ -7,10 +7,24 @@ Eres responsable de guardar el trabajo actual siguiendo el flujo de Israel. Ejec
 ## Reglas
 1. **NUNCA commitear directo a `main`.** Siempre trabajar sobre una rama feature.
 2. **Nomenclatura de ramas:** `<tipo>/<descripcion-kebab-case>` (ej. `feat/perfil-edicion`, `fix/datepicker-ios`).
-3. **Nomenclatura de commits (Conventional Commits, en español):**
-   - Prefijos: `feat:`, `fix:`, `refactor:`, `chore:`, `docs:`, `style:`, `test:`.
+3. **Nomenclatura de commits (Conventional Commits + Gitmoji, en español):**
+   - Formato: `<emoji> <tipo>(scope opcional): <descripción>`.
    - Mensaje en minúscula, conciso, que diga *qué* y *dónde*.
-   - Opcional scope: `feat(strapi): ...`, `refactor(config): ...`.
+   - Emoji según el tipo (Gitmoji):
+     | Tipo | Emoji | Cuándo |
+     |------|-------|--------|
+     | `feat` | ✨ | nueva funcionalidad |
+     | `fix` | 🐛 | corrección de bug |
+     | `refactor` | ♻️ | refactor sin cambiar comportamiento |
+     | `docs` | 📝 | documentación |
+     | `style` | 💄 | UI / estilos / formato visual |
+     | `chore` (deps) | ⬆️ | actualizar/instalar dependencias |
+     | `chore` (config) | 🔧 | configuración / tooling |
+     | `test` | ✅ | pruebas |
+     | `perf` | ⚡️ | rendimiento |
+     | `security` | 🔒 | seguridad / secretos |
+     | `remove` | 🔥 | eliminar código/archivos |
+   - Ejemplos: `✨ feat(strapi): conectar pantalla de clases`, `🐛 fix: corregir datepicker en iOS`, `⬆️ chore(deps): alinear a Expo SDK 54`.
 4. **Un commit = un cambio lógico.** Agrupa los archivos por intención y haz commits separados
    (deps, feature, refactor, docs van en commits distintos).
 5. **División por feature:** si el trabajo abarca varias features independientes (archivos sin
