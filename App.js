@@ -4,9 +4,15 @@ import { AuthProvider, useAuth } from "./src/context/AuthContext";
 import { NotificationProvider } from "./src/context/NotificationContext";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { asyncStoragePersister, PERSIST_MAX_AGE_MS, queryClient } from "./src/lib/query/queryClient";
+import { isDevAuthBypass } from "./src/config/env";
 
 function Root() {
   const { session, hasProfile, initializing } = useAuth();
+
+  // Bypass de desarrollo (DEV_SKIP_AUTH): entra al Home sin login real.
+  if (isDevAuthBypass()) {
+    return <AppNavigator session={{ dev: true }} hasProfile />;
+  }
 
   if (initializing) return null;
 

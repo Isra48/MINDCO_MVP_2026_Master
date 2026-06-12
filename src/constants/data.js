@@ -19,6 +19,19 @@ export const categories = [
   },
 ];
 
+// Challenge destacado del mes (opcional). Si `active` es false, la card no se muestra.
+export const monthlyChallenge = {
+  id: "challenge-2026-06",
+  active: true,
+  badge: "Challenge del mes",
+  emoji: "🔥",
+  title: "21 días de meditación",
+  subtitle: "Únete al reto y crea el hábito 🧘",
+  image:
+    "https://img.freepik.com/free-photo/young-attractive-woman-corpse-pose-studio-floor-background_1163-4610.jpg?w=740",
+  url: "https://mindco.app/challenge",
+};
+
 export const classes = [
   {
     id: "class-1",
