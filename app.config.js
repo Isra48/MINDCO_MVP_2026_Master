@@ -10,7 +10,18 @@ export default {
     orientation: "portrait",
     platforms: ["ios", "android", "web"],
     assetBundlePatterns: ["**/*"],
-    plugins: ["expo-secure-store"],
+    plugins: [
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          photosPermission:
+            "MindCo necesita acceso a tus fotos para que elijas tu foto de perfil.",
+          cameraPermission:
+            "MindCo necesita acceso a la cámara para que tomes tu foto de perfil.",
+        },
+      ],
+    ],
     extra: {
       STRAPI_URL: process.env.STRAPI_URL || "",
       STRAPI_API_TOKEN: process.env.STRAPI_API_TOKEN || "",
