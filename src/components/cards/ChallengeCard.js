@@ -4,7 +4,6 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  Image,
   View,
   Easing,
 } from "react-native";
@@ -12,14 +11,14 @@ import { Feather } from "@expo/vector-icons";
 import colors from "../../constants/colors";
 
 /**
- * Card del "Challenge del mes". Compacta (≈ tamaño de las cards de clase),
- * con imagen de fondo y entrada animada (fade + slide-up + escala sutil).
- * Al tocar, dispara `onPress` para abrir el reto en una página externa.
+ * Card del "Challenge del mes". Diseño limpio: icono + texto a la izquierda y
+ * un chevron a la derecha. Entra con animación sutil (fade + slide-up +
+ * escala). Al tocar, dispara `onPress` para abrir el reto en una web externa.
  */
 export default function ChallengeCard({ item, onPress }) {
   const opacity = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(18)).current;
-  const scale = useRef(new Animated.Value(0.96)).current;
+  const translateY = useRef(new Animated.Value(16)).current;
+  const scale = useRef(new Animated.Value(0.97)).current;
 
   useEffect(() => {
     Animated.parallel([
@@ -49,47 +48,32 @@ export default function ChallengeCard({ item, onPress }) {
 
   if (!item) return null;
 
-  const hasImage = typeof item.image === "string" && item.image.length > 0;
-
   return (
     <Animated.View
       style={[styles.wrapper, { opacity, transform: [{ translateY }, { scale }] }]}
     >
       <TouchableOpacity
         style={styles.card}
-        activeOpacity={0.9}
+        activeOpacity={0.85}
         onPress={() => onPress?.(item)}
       >
-        {hasImage ? (
-          <Image source={{ uri: item.image }} style={styles.image} />
-        ) : (
-          <View style={[StyleSheet.absoluteFillObject, styles.imageFallback]} />
-        )}
-
-        <View style={styles.overlay}>
-          <View style={styles.topRow}>
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>
-                {item.emoji ? `${item.emoji} ` : ""}
-                {item.badge || "Challenge del mes"}
-              </Text>
-            </View>
-            <View style={styles.linkIcon}>
-              <Feather name="arrow-up-right" size={16} color={colors.white} />
-            </View>
-          </View>
-
-          <View>
-            <Text style={styles.title} numberOfLines={1}>
-              {item.title}
-            </Text>
-            {item.subtitle ? (
-              <Text style={styles.subtitle} numberOfLines={1}>
-                {item.subtitle}
-              </Text>
-            ) : null}
-          </View>
+        <View style={styles.iconBadge}>
+          <Feather name={item.icon || "target"} size={22} color={colors.primary} />
         </View>
+
+        <View style={styles.content}>
+          <Text style={styles.eyebrow}>{item.badge || "Challenge del mes"}</Text>
+          <Text style={styles.title} numberOfLines={1}>
+            {item.title}
+          </Text>
+          {item.progressLabel ? (
+            <Text style={styles.progressLabel} numberOfLines={1}>
+              {item.progressLabel}
+            </Text>
+          ) : null}
+        </View>
+
+        <Feather name="chevron-right" size={22} color={colors.gray} />
       </TouchableOpacity>
     </Animated.View>
   );
@@ -98,60 +82,49 @@ export default function ChallengeCard({ item, onPress }) {
 const styles = StyleSheet.create({
   wrapper: {
     marginHorizontal: 18,
+    marginTop: 10,
     marginBottom: 16,
   },
   card: {
-    height: 128,
-    borderRadius: 18,
-    overflow: "hidden",
-    backgroundColor: colors.lightGray,
-  },
-  image: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  imageFallback: {
-    backgroundColor: colors.secondary,
-  },
-  overlay: {
-    flex: 1,
-    padding: 14,
-    backgroundColor: "rgba(0,0,0,0.35)",
-    justifyContent: "space-between",
-  },
-  topRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
+    alignItems: "center",
+    backgroundColor: colors.white,
+    borderRadius: 18,
+    padding: 14,
+    // sombra suave, difusa y discreta
+    shadowColor: "#1a1a2e",
+    shadowOpacity: 0.06,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 4,
   },
-  badge: {
-    alignSelf: "flex-start",
-    backgroundColor: colors.primary,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
-  },
-  badgeText: {
-    color: colors.white,
-    fontSize: 12,
-    fontWeight: "700",
-  },
-  linkIcon: {
-    width: 28,
-    height: 28,
+  iconBadge: {
+    width: 44,
+    height: 44,
     borderRadius: 14,
-    backgroundColor: "rgba(0,0,0,0.35)",
+    backgroundColor: "rgba(193,122,76,0.12)", // primary @ 12%
     alignItems: "center",
     justifyContent: "center",
+    marginRight: 12,
+  },
+  content: {
+    flex: 1,
+  },
+  eyebrow: {
+    fontSize: 12,
+    color: colors.gray,
+    fontWeight: "600",
+    marginBottom: 1,
   },
   title: {
-    color: colors.white,
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: "700",
+    color: colors.darkText,
   },
-  subtitle: {
-    color: colors.white,
+  progressLabel: {
     fontSize: 13,
+    color: colors.primary,
+    fontWeight: "600",
     marginTop: 2,
-    opacity: 0.9,
   },
 });
