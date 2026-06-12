@@ -2,16 +2,22 @@ import React, { useState } from "react";
 import { View, Text, ScrollView, Switch, TouchableOpacity, StyleSheet, Alert, Linking } from "react-native";
 import { globalStyles } from "../styles/globalStyles";
 import colors from "../constants/colors";
-import { deleteUser } from "../utils/storage";
 import { useNotifications } from "../context/NotificationContext";
+import { useAuth } from "../context/AuthContext";
 
-export default function SettingsScreen({ navigation }) {
+export default function SettingsScreen() {
   const [email, setEmail] = useState(false);
   const { pushEnabled, togglePushEnabled, refreshPermissions, cancelAllNotifications } = useNotifications();
+  const { signOut } = useAuth();
 
   const logout = async () => {
-    await deleteUser();
-    navigation.reset({ index: 0, routes: [{ name: "Login" }] });
+    // Al cerrar sesión, la sesión de Supabase se limpia y la navegación
+    // (AuthContext) vuelve a la pantalla de Login automáticamente.
+    try {
+      await signOut();
+    } catch (error) {
+      Alert.alert("Error", error?.message || "No se pudo cerrar sesión.");
+    }
   };
 
   const handlePushToggle = async (value) => {
