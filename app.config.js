@@ -1,17 +1,19 @@
 // Configuración dinámica de Expo.
-// Los secretos (STRAPI_URL, STRAPI_API_TOKEN) se leen de variables de entorno
-// definidas en `.env` (gitignored) y NUNCA se commitean.
-// Expo CLI carga automáticamente los archivos `.env*` en process.env.
+// Los secretos/llaves se leen de variables de entorno definidas en `.env`
+// (gitignored) y NUNCA se commitean. Expo CLI carga `.env*` en process.env.
 export default {
   expo: {
     name: "CodexReactNativeTest1",
     slug: "codexreactnativetest1",
     version: "1.0.0",
     orientation: "portrait",
+    // Esquema de deep linking (necesario para el callback de OAuth de Google).
+    scheme: "mindco",
     platforms: ["ios", "android", "web"],
     assetBundlePatterns: ["**/*"],
     plugins: [
       "expo-secure-store",
+      "expo-web-browser",
       [
         "expo-image-picker",
         {
@@ -30,6 +32,9 @@ export default {
       CONTENT_SOURCE: process.env.CONTENT_SOURCE || "mock",
       LOGIN_REFETCH_ALWAYS: process.env.LOGIN_REFETCH_ALWAYS || "true",
       LOGIN_STALE_HOURS: process.env.LOGIN_STALE_HOURS || "12",
+      // Supabase (Auth). La publishable/anon key es pública y segura en el cliente.
+      SUPABASE_URL: process.env.SUPABASE_URL || "",
+      SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY || "",
     },
   },
 };

@@ -23,6 +23,9 @@ export const getLoginStaleHours = () => {
 };
 export const getLoginRefetchAlways = () => readEnvValue("LOGIN_REFETCH_ALWAYS") === "true";
 
+export const getSupabaseUrl = () => readEnvValue("SUPABASE_URL") || "";
+export const getSupabaseAnonKey = () => readEnvValue("SUPABASE_ANON_KEY") || "";
+
 export const isUsingStrapi = () => getContentSource() === "strapi";
 export const isMockSource = () => !isUsingStrapi();
 

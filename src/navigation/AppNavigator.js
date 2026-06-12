@@ -13,16 +13,17 @@ import SettingsScreen from "../screens/SettingsScreen";
 import CustomTabBar from "../components/navigation/CustomTabBar";
 
 const RootStack = createNativeStackNavigator();
-const Stack = createNativeStackNavigator();
+const AuthStackNav = createNativeStackNavigator();
+const AppStackNav = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 /* ---------- AUTH STACK ---------- */
 function AuthStack() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Register" component={RegisterScreen} />
-    </Stack.Navigator>
+    <AuthStackNav.Navigator screenOptions={{ headerShown: false }}>
+      <AuthStackNav.Screen name="Login" component={LoginScreen} />
+      <AuthStackNav.Screen name="Register" component={RegisterScreen} />
+    </AuthStackNav.Navigator>
   );
 }
 
@@ -40,30 +41,43 @@ function AppTabs() {
   );
 }
 
-/* ---------- ROOT NAVIGATOR ---------- */
-export default function AppNavigator({ logged }) {
+/* ---------- APP STACK (usuario autenticado) ----------
+   Inicia en ProfileEditor si el perfil aún no está completo (onboarding),
+   o directamente en las pestañas si ya lo está. */
+function AppStack({ hasProfile }) {
+  return (
+    <AppStackNav.Navigator
+      initialRouteName={hasProfile ? "Home" : "ProfileEditor"}
+      screenOptions={{ headerShown: false }}
+    >
+      {/* Se llama "Home" para que ProfileEditor.reset({name:"Home"}) resuelva aquí. */}
+      <AppStackNav.Screen name="Home" component={AppTabs} />
+      <AppStackNav.Screen
+        name="ProfileEditor"
+        component={ProfileEditorScreen}
+        options={{
+          headerShown: true,
+          title: "",
+          headerBackTitleVisible: false,
+        }}
+      />
+    </AppStackNav.Navigator>
+  );
+}
+
+/* ---------- ROOT NAVIGATOR ----------
+   La sesión de Supabase decide Auth vs App de forma reactiva. */
+export default function AppNavigator({ session, hasProfile }) {
   return (
     <NavigationContainer ref={navigationRef}>
       <RootStack.Navigator screenOptions={{ headerShown: false }}>
-
-        {/* Auth o App */}
-        {!logged ? (
+        {!session ? (
           <RootStack.Screen name="Auth" component={AuthStack} />
         ) : (
-          <RootStack.Screen name="App" component={AppTabs} />
+          <RootStack.Screen name="App">
+            {() => <AppStack hasProfile={hasProfile} />}
+          </RootStack.Screen>
         )}
-
-        {/* Perfil accesible desde cualquier lugar */}
-        <RootStack.Screen
-          name="ProfileEditor"
-          component={ProfileEditorScreen}
-          options={{
-            headerShown: true,
-            title: "",
-            headerBackTitleVisible: false,
-          }}
-        />
-
       </RootStack.Navigator>
     </NavigationContainer>
   );

@@ -13,16 +13,18 @@ import PrimaryButton from "../components/buttons/PrimaryButton";
 import TextField from "../components/common/TextField";
 import SkeletonBlock from "../components/common/SkeletonBlock";
 import colors from "../constants/colors";
-import { setUser } from "../utils/storage";
 import { KeyboardAvoidingView, Platform } from "react-native";
+import { AntDesign } from "@expo/vector-icons";
 import loginBg from "../../assets/images/Welcome.png";
 import { useRegisterContentQuery } from "../services/content/register.queries";
+import { signUpWithEmail, signInWithGoogle } from "../lib/supabase/auth";
 
 export default function RegisterScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const {
     data: registerContent,
     isLoading: isRegisterContentLoading,
@@ -41,10 +43,39 @@ export default function RegisterScreen({ navigation }) {
     }
 
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    await setUser({ email });
+    try {
+      const { needsConfirmation } = await signUpWithEmail(email, password);
+      if (needsConfirmation) {
+        // El proyecto exige confirmar el correo: no hay sesión todavía.
+        Alert.alert(
+          "Confirma tu correo",
+          "Te enviamos un enlace de confirmación. Confírmalo e inicia sesión.",
+          [{ text: "Ir a iniciar sesión", onPress: () => navigation.navigate("Login") }]
+        );
+      }
+      // Si hay sesión, AuthContext muestra el onboarding/app automáticamente.
+    } catch (error) {
+      Alert.alert(
+        "No se pudo registrar",
+        error?.message || "Inténtalo de nuevo."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    navigation.reset({ index: 0, routes: [{ name: "ProfileEditor" }] });
+  const handleGoogle = async () => {
+    setGoogleLoading(true);
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      Alert.alert(
+        "Google",
+        error?.message || "No se pudo continuar con Google."
+      );
+    } finally {
+      setGoogleLoading(false);
+    }
   };
 
   const showRegisterSkeleton =
@@ -129,6 +160,24 @@ export default function RegisterScreen({ navigation }) {
             loading={loading}
           />
 
+          <View style={styles.dividerRow}>
+            <View style={styles.divider} />
+            <Text style={styles.dividerText}>o</Text>
+            <View style={styles.divider} />
+          </View>
+
+          <TouchableOpacity
+            style={styles.googleButton}
+            onPress={handleGoogle}
+            disabled={googleLoading}
+            activeOpacity={0.8}
+          >
+            <AntDesign name="google" size={18} color={colors.darkText} />
+            <Text style={styles.googleButtonText}>
+              {googleLoading ? "Conectando…" : "Continuar con Google"}
+            </Text>
+          </TouchableOpacity>
+
           <TouchableOpacity onPress={() => navigation.navigate("Login")}>
             <Text style={styles.linkText}>Ya tengo cuenta</Text>
           </TouchableOpacity>
@@ -195,5 +244,36 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontWeight: "600",
     marginTop: 16,
+  },
+  dividerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 16,
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: colors.lightGray,
+  },
+  dividerText: {
+    marginHorizontal: 12,
+    color: colors.gray,
+  },
+  googleButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    height: 52,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.lightGray,
+    backgroundColor: colors.white,
+    marginTop: 16,
+  },
+  googleButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: colors.darkText,
   },
 });
