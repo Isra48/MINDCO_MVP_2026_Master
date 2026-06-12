@@ -1,4 +1,5 @@
 import { strapiApi } from "../api/strapiApi";
+import { flattenList } from "../../lib/strapi/normalize";
 
 const HOME_ENDPOINT = "/api/homes";
 
@@ -9,8 +10,7 @@ export const getHomeContent = async (params = {}) => {
     fields,
     ...params,
   });
-  const firstItem = response?.data?.[0];
-  const attributes = firstItem?.attributes || {};
+  const attributes = flattenList(response?.data)[0] || {};
 
   return {
     carouselTitle: attributes?.tituloCarrousel || "",

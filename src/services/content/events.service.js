@@ -1,5 +1,6 @@
 import { strapiApi } from "../api/strapiApi";
 import { getStrapiUrl } from "../../config/env";
+import { flattenEntity, flattenMedia, pickMediaUrl } from "../../lib/strapi/normalize";
 
 const EVENTS_ENDPOINT = "/api/carrousels";
 
@@ -30,25 +31,13 @@ export const getEvents = async (params = {}) => {
     ...params,
   });
   return (response?.data || []).map((event) => {
-    const attributes = event?.attributes || {};
-    const imageAttributes = attributes?.image?.data?.attributes;
+    const attributes = flattenEntity(event);
     const directImage =
       typeof attributes?.image === "string" ? attributes.image : null;
-    const nestedImageUrl =
-      attributes?.image?.url ||
-      attributes?.image?.data?.url ||
-      attributes?.image?.data?.attributes?.url ||
-      null;
-    const imageUrl =
-      directImage ||
-      nestedImageUrl ||
-      imageAttributes?.formats?.medium?.url ||
-      imageAttributes?.formats?.small?.url ||
-      imageAttributes?.url ||
-      null;
+    const imageUrl = directImage || pickMediaUrl(flattenMedia(attributes?.image));
 
     return {
-      id: String(event.id),
+      id: String(attributes.id ?? event.id),
       name: attributes?.title || "",
       image: resolveAssetUrl(imageUrl),
       link: attributes?.link || "",
