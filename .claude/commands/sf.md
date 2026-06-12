@@ -8,7 +8,9 @@ Eres responsable de guardar el trabajo actual siguiendo el flujo de Israel. Ejec
 1. **NUNCA commitear directo a `main`.** Siempre trabajar sobre una rama feature.
 2. **Nomenclatura de ramas:** `<tipo>/<descripcion-kebab-case>` (ej. `feat/perfil-edicion`, `fix/datepicker-ios`).
 3. **Nomenclatura de commits (Conventional Commits + Gitmoji, en español):**
-   - Formato: `<emoji> <tipo>(scope opcional): <descripción>`.
+   - Formato: `<tipo>(scope opcional): <descripción> <emoji>`.
+     ⚠️ El **emoji va AL FINAL** del título (no al inicio), para no afectar la indexación/parseo.
+   - Aplica igual al **título del PR**: emoji al final.
    - Mensaje en minúscula, conciso, que diga *qué* y *dónde*.
    - Emoji según el tipo (Gitmoji):
      | Tipo | Emoji | Cuándo |
@@ -24,7 +26,7 @@ Eres responsable de guardar el trabajo actual siguiendo el flujo de Israel. Ejec
      | `perf` | ⚡️ | rendimiento |
      | `security` | 🔒 | seguridad / secretos |
      | `remove` | 🔥 | eliminar código/archivos |
-   - Ejemplos: `✨ feat(strapi): conectar pantalla de clases`, `🐛 fix: corregir datepicker en iOS`, `⬆️ chore(deps): alinear a Expo SDK 54`.
+   - Ejemplos: `feat(strapi): conectar pantalla de clases ✨`, `fix: corregir datepicker en iOS 🐛`, `chore(deps): alinear a Expo SDK 54 ⬆️`.
 4. **Un commit = un cambio lógico.** Agrupa los archivos por intención y haz commits separados
    (deps, feature, refactor, docs van en commits distintos).
 5. **División por feature:** si el trabajo abarca varias features independientes (archivos sin
@@ -43,8 +45,9 @@ Eres responsable de guardar el trabajo actual siguiendo el flujo de Israel. Ejec
       `Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>`
    d. `git push -u origin <rama>`.
    e. Abre el PR hacia `main`: `gh pr create --base main --head <rama> --title "<titulo>" --body "<resumen>"`.
-      El body termina con: `🤖 Generated with [Claude Code](https://claude.com/claude-code)`.
-4. **Devuelve a Israel:** el/los nombres de rama y la(s) URL(s) del PR, para que él haga el merge.
-   No hagas merge tú.
+      El título lleva el **emoji al final**. El body termina con: `🤖 Generated with [Claude Code](https://claude.com/claude-code)`.
+4. **Vuelve a `main` y actualiza:** tras abrir el/los PR, `git checkout main && git pull` para dejar
+   el entorno limpio y listo para la siguiente tarea. (No hagas merge tú — eso lo hace Israel desde el PR.)
+5. **Devuelve a Israel:** el/los nombres de rama y la(s) URL(s) del PR, para que él haga el merge.
 
 Si `$ARGUMENTS` trae texto, úsalo como pista para el título/descripción o el nombre de la rama.
