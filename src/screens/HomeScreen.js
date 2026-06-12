@@ -18,6 +18,7 @@ import colors from "../constants/colors";
 import { globalStyles } from "../styles/globalStyles";
 
 import HeroCard from "../components/cards/HeroCard";
+import ChallengeCard from "../components/cards/ChallengeCard";
 import CategoryCard from "../components/cards/CategoryCard";
 import DestinationCard from "../components/cards/DestinationCard";
 import ClassInfoBottomSheet from "../components/common/ClassInfoBottomSheet";
@@ -26,6 +27,7 @@ import SkeletonBlock from "../components/common/SkeletonBlock";
 import { useHeroClassQuery, useHomeClassesQuery } from "../services/content/classes.queries";
 import { useEventsQuery } from "../services/content/events.queries";
 import { useHomeContentQuery } from "../services/content/home.queries";
+import { useMonthlyChallengeQuery } from "../services/content/challenge.queries";
 
 
 import { useNotifications } from "../context/NotificationContext";
@@ -73,6 +75,7 @@ export default function HomeScreen() {
     isError: isHomeContentError,
     refetch: refetchHomeContent,
   } = useHomeContentQuery();
+  const { data: challenge, refetch: refetchChallenge } = useMonthlyChallengeQuery();
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
@@ -85,11 +88,16 @@ export default function HomeScreen() {
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     try {
-      await Promise.all([refetch(), refetchEvents(), refetchHomeContent()]);
+      await Promise.all([
+        refetch(),
+        refetchEvents(),
+        refetchHomeContent(),
+        refetchChallenge(),
+      ]);
     } finally {
       setRefreshing(false);
     }
-  }, [refetch, refetchEvents, refetchHomeContent]);
+  }, [refetch, refetchEvents, refetchHomeContent, refetchChallenge]);
 
   const showHeroSkeleton =
     !refreshing &&
@@ -158,6 +166,22 @@ export default function HomeScreen() {
     );
   };
 
+  const handleOpenChallenge = async (challengeItem) => {
+    const url = challengeItem?.url;
+    if (!url) return;
+    try {
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        await Linking.openURL(url);
+      }
+    } catch (error) {
+      if (__DEV__) {
+        // eslint-disable-next-line no-console
+        console.warn("Failed to open challenge link", error);
+      }
+    }
+  };
+
   const handleOpenEventLink = async (eventItem) => {
     const url = eventItem?.link;
     if (!url) return;
@@ -211,6 +235,11 @@ export default function HomeScreen() {
           </View>
         </TouchableOpacity>
       </View>
+
+      {/* Challenge del mes (opcional) */}
+      {challenge ? (
+        <ChallengeCard item={challenge} onPress={handleOpenChallenge} />
+      ) : null}
 
       {/* Hero */}
       {showHeroSkeleton ? (
