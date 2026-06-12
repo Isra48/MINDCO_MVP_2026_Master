@@ -24,11 +24,9 @@ export const monthlyChallenge = {
   id: "challenge-2026-06",
   active: true,
   badge: "Challenge del mes",
-  emoji: "🔥",
+  icon: "target", // nombre de icono de Feather
   title: "21 días de meditación",
-  subtitle: "Únete al reto y crea el hábito 🧘",
-  image:
-    "https://img.freepik.com/free-photo/young-attractive-woman-corpse-pose-studio-floor-background_1163-4610.jpg?w=740",
+  progressLabel: "Día 5 de 21",
   url: "https://mindco.app/challenge",
 };
 
