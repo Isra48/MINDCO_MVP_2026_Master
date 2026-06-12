@@ -31,5 +31,9 @@ export const config = {
   strapiToken: getStrapiToken(),
   contentSource: getContentSource(),
 };
-console.log("EXPO EXTRA:", Constants.expoConfig?.extra);
-console.log("CONTENT_SOURCE:", getContentSource());
+
+if (__DEV__) {
+  // No imprimir el token. Solo info útil para depurar la fuente de datos.
+  // eslint-disable-next-line no-console
+  console.log("[config] CONTENT_SOURCE:", getContentSource(), "| STRAPI_URL set:", Boolean(getStrapiUrl()));
+}

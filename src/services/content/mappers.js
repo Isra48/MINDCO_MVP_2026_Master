@@ -4,6 +4,7 @@ import {
   normalizeDateValue,
 } from "../../utils/dateFormatting";
 import { getStrapiUrl } from "../../config/env";
+import { flattenMedia, pickMediaUrl } from "../../lib/strapi/normalize";
 
 const DEFAULT_TIMEZONE = "America/Mexico_City";
 
@@ -86,19 +87,13 @@ export const mapStrapiClassToAppModel = (attributes = {}, id) => {
     ? formatTimeLabel(startAtISO, timezone)
     : "";
 
-  // Imagen (Strapi Cloud o fallback)
-  const imageAttributes = attributes?.image?.data?.attributes;
-  const imageUrl =
-    imageAttributes?.formats?.medium?.url ||
-    imageAttributes?.formats?.small?.url ||
-    imageAttributes?.url ||
-    attributes?.image?.url ||
-    attributes?.image?.data?.attributes?.url ||
-    null;
+  // Imagen: soporta media de Strapi v4 y v5 (ver lib/strapi/normalize).
+  const imageUrl = pickMediaUrl(flattenMedia(attributes?.image));
 
   const instructorName =
+    attributes?.instructor?.data?.attributes?.name ||
     attributes?.instructor?.name ||
-    attributes.instructor ||
+    (typeof attributes.instructor === "string" ? attributes.instructor : "") ||
     "";
 
   return {

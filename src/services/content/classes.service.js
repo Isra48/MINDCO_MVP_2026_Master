@@ -1,5 +1,6 @@
 import { strapiApi } from "../api/strapiApi";
 import { mapStrapiClassToAppModel } from "./mappers";
+import { flattenEntity } from "../../lib/strapi/normalize";
 
 const CLASSES_ENDPOINT = "/api/classes";
 
@@ -47,10 +48,10 @@ export const getClasses = async ({ upcomingOnly, limit } = {}) => {
     sort: ["startAt:asc"],
   });
 
-  return (response?.data || []).map((item) =>
-    mapStrapiClassToAppModel(item?.attributes || {}, item.id)
-  );
-
+  return (response?.data || []).map((item) => {
+    const entity = flattenEntity(item);
+    return mapStrapiClassToAppModel(entity, entity.id ?? item.id);
+  });
 };
 
 export const getClassById = async (id) => {
@@ -59,7 +60,7 @@ export const getClassById = async (id) => {
     fields,
     ...basePopulate,
   });
-  const attributes = response?.data?.attributes;
-  if (!attributes) return null;
-  return mapStrapiClassToAppModel(attributes, response.data.id);
+  const entity = flattenEntity(response?.data);
+  if (!entity || (!entity.title && entity.id === undefined)) return null;
+  return mapStrapiClassToAppModel(entity, entity.id ?? response?.data?.id);
 };

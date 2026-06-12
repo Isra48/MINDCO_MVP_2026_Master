@@ -1,20 +1,17 @@
 import { strapiApi } from "../api/strapiApi";
 import { extractMediaFromAttributes } from "./media";
+import { flattenEntity } from "../../lib/strapi/normalize";
 
 const REGISTER_ENDPOINT = "/api/register";
 
+// Soporta single type / collection en Strapi v4 (attributes) y v5 (plano).
 const pickAttributes = (response) => {
-  const payload = response?.data;
-  if (Array.isArray(payload)) {
-    return payload[0]?.attributes || {};
+  let payload = response?.data;
+  if (Array.isArray(payload)) payload = payload[0];
+  else if (payload?.data) {
+    payload = Array.isArray(payload.data) ? payload.data[0] : payload.data;
   }
-  if (payload?.data) {
-    if (Array.isArray(payload.data)) {
-      return payload.data[0]?.attributes || {};
-    }
-    return payload.data?.attributes || {};
-  }
-  return payload?.attributes || {};
+  return flattenEntity(payload);
 };
 
 export const getRegisterContent = async (params = {}) => {
