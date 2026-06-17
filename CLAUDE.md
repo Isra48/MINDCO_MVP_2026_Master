@@ -108,3 +108,47 @@ refactor logic notification and rendering data class in cards
 - Que la app levante (`npm run start`) sin errores de import.
 - No dejar `console.log` de depuración ni el flag `CONTENT_SOURCE=strapi` apuntando a una
   instancia local en commits destinados a producción.
+
+---
+
+## Builds — qué preguntar y qué setear
+
+> ⚠️ **REGLA PARA CLAUDE:** cada vez que Israel pida **hacer un build** (EAS, `expo build`,
+> `expo prebuild`, build de release, APK/IPA, etc.), **antes de ejecutar nada PREGUNTAR**:
+> *"¿este build es para **producción** o para seguir en **dev/preview**?"* — y según la respuesta,
+> repasar con él el checklist de abajo y ajustar el `.env` / `app.config.js` en consecuencia.
+> Nunca asumir el destino del build ni dejar flags de dev en un build de producción.
+
+El `.env` es local y gitignored; los valores llegan a la app vía `app.config.js → extra` y se leen
+en [src/config/env.js](src/config/env.js). Estos son los flags que cambian entre dev y producción:
+
+| Flag (`.env`) | Dev / preview | **Producción** | Por qué |
+|---------------|---------------|----------------|---------|
+| `CONTENT_SOURCE` | `mock` o `strapi` | `strapi` | En prod siempre datos reales del CMS, no mocks. |
+| `CONTENT_PREVIEW_MODE` | `true` (refresca casi en vivo) | **`false`** o ausente | El modo preview sobre-pide a Strapi; en prod la frescura la da `CONTENT_CACHE_HOURS`. |
+| `CONTENT_CACHE_HOURS` | indiferente | `6` (o el acordado) | Horas que el contenido vive en caché; cuida la cuota de Strapi. Solo aplica con preview off. |
+| `CONTENT_PREVIEW_STALE_SECONDS` | `30` | indiferente (preview off) | Solo afecta en modo preview. |
+| `DEV_SKIP_AUTH` | `true` (entra al Home sin login) | **`false`** o ausente | Bypass de auth SOLO dev; jamás en prod. Hoy existe porque el login Supabase sigue roto. |
+| `STRAPI_API_TOKEN` | token read-only | token read-only (NO commitear) | Nunca subir el token; siempre read-only. |
+| `LOGIN_REFETCH_ALWAYS` / `LOGIN_STALE_HOURS` | `true` / `12` | revisar | Frescura de las pantallas de auth. |
+
+### Checklist antes de un build de PRODUCCIÓN
+1. **`CONTENT_SOURCE=strapi`** y `STRAPI_URL` / `STRAPI_API_TOKEN` (read-only) correctos.
+2. **`CONTENT_PREVIEW_MODE=false`** (o quitarlo) y `CONTENT_CACHE_HOURS` en el valor acordado.
+3. **`DEV_SKIP_AUTH=false`** (o quitarlo). ⚠️ Recordar: el bypass solo vive en la rama del PR #14,
+   y el **login real de Supabase aún está roto** — si no está arreglado/mergeado, un build de prod
+   no podrá pasar del login. Confirmar con Israel antes de buildear.
+4. **Acotar `populate: "*"`** en [login.service.js](src/services/content/login.service.js) y
+   [register.service.js](src/services/content/register.service.js) al campo real de imagen (deuda
+   pendiente; confirmar el nombre del campo en el CMS antes — `populate` a ciegas rompe con 400).
+5. **`useDebouncedValue` conectado al buscador del Home** (pendiente; evita fetch por cada tecla).
+6. Sin `console.log` de depuración. App levanta sin errores de import (`npx expo start -c`).
+7. **EAS sin configurar todavía:** `eas.json` está vacío. Antes del primer build con EAS hay que
+   definir los perfiles (`development` / `preview` / `production`) y decidir cómo se inyectan estas
+   variables en el build remoto (los `.env` locales NO viajan al builder de EAS — usar
+   `eas secret` / `eas env` o las env vars del perfil). Confirmar esto con Israel.
+
+### Para un build de DEV / preview
+- `DEV_SKIP_AUTH=true` para entrar al Home sin login mientras Supabase no esté listo.
+- `CONTENT_PREVIEW_MODE=true` si se quiere ver el contenido del CMS casi en tiempo real.
+- `CONTENT_SOURCE=strapi` o `mock` según lo que se esté probando.
