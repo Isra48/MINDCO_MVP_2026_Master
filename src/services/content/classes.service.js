@@ -23,6 +23,9 @@ const fields = [
   "modality",
   "materials",
   "isActive",
+  "durationMinutes",
+  "zoomLink",
+  "isFeatured",
 ];
 
 const buildFilters = ({ upcomingOnly }) => {
