@@ -121,6 +121,9 @@ export default function HomeScreen() {
     (isHomeContentLoading || isHomeContentFetching || isHomeContentError);
   const shouldRenderListSection = classList.length > 0 || showListSkeleton;
   const eventsList = eventsData || [];
+  // La isla de eventos (título + carrusel) solo se muestra si hay items visibles
+  // o si está cargando; si no hay eventos visibles se oculta por completo.
+  const shouldRenderEventsSection = eventsList.length > 0 || showEventsSkeleton;
   const carouselTitle = homeContent?.carouselTitle || "Eventos presenciales";
   const listTitle = homeContent?.listTitle || "Próximas clases";
 
@@ -258,40 +261,44 @@ export default function HomeScreen() {
         )
       )}
 
-      {/* Categorías */}
-      {showCarouselTitleSkeleton ? (
-        <SkeletonBlock style={[styles.sectionTitleSkeleton, styles.sectionTitle]} />
-      ) : (
-        <Text style={[globalStyles.sectionTitle, styles.sectionTitle]}>
-          {carouselTitle}
-        </Text>
-      )}
+      {/* Eventos presenciales (isla de eventos) */}
+      {shouldRenderEventsSection && (
+        <>
+          {showCarouselTitleSkeleton ? (
+            <SkeletonBlock style={[styles.sectionTitleSkeleton, styles.sectionTitle]} />
+          ) : (
+            <Text style={[globalStyles.sectionTitle, styles.sectionTitle]}>
+              {carouselTitle}
+            </Text>
+          )}
 
-      {showEventsSkeleton ? (
-        <FlatList
-          horizontal
-          data={Array.from({ length: 4 }, (_, index) => `event-skeleton-${index}`)}
-          keyExtractor={(item) => item}
-          contentContainerStyle={styles.categoryListContent}
-          renderItem={() => (
-            <View style={styles.categorySkeletonCard}>
-              <SkeletonBlock style={styles.categorySkeletonImage} />
-              <SkeletonBlock style={styles.categorySkeletonLine} />
-            </View>
+          {showEventsSkeleton ? (
+            <FlatList
+              horizontal
+              data={Array.from({ length: 4 }, (_, index) => `event-skeleton-${index}`)}
+              keyExtractor={(item) => item}
+              contentContainerStyle={styles.categoryListContent}
+              renderItem={() => (
+                <View style={styles.categorySkeletonCard}>
+                  <SkeletonBlock style={styles.categorySkeletonImage} />
+                  <SkeletonBlock style={styles.categorySkeletonLine} />
+                </View>
+              )}
+              showsHorizontalScrollIndicator={false}
+            />
+          ) : (
+            <FlatList
+              horizontal
+              data={eventsList}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={styles.categoryListContent}
+              renderItem={({ item }) => (
+                <CategoryCard item={item} onPress={() => handleOpenEventLink(item)} />
+              )}
+              showsHorizontalScrollIndicator={false}
+            />
           )}
-          showsHorizontalScrollIndicator={false}
-        />
-      ) : (
-        <FlatList
-          horizontal
-          data={eventsList}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.categoryListContent}
-          renderItem={({ item }) => (
-            <CategoryCard item={item} onPress={() => handleOpenEventLink(item)} />
-          )}
-          showsHorizontalScrollIndicator={false}
-        />
+        </>
       )}
 
       {/* Próximas clases */}
