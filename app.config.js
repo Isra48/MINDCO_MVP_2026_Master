@@ -32,6 +32,10 @@ export default {
       CONTENT_SOURCE: process.env.CONTENT_SOURCE || "mock",
       LOGIN_REFETCH_ALWAYS: process.env.LOGIN_REFETCH_ALWAYS || "true",
       LOGIN_STALE_HOURS: process.env.LOGIN_STALE_HOURS || "12",
+      // Caché/preview del contenido del CMS (ver .env.example).
+      CONTENT_CACHE_HOURS: process.env.CONTENT_CACHE_HOURS || "6",
+      CONTENT_PREVIEW_MODE: process.env.CONTENT_PREVIEW_MODE || "false",
+      CONTENT_PREVIEW_STALE_SECONDS: process.env.CONTENT_PREVIEW_STALE_SECONDS || "30",
       // Supabase (Auth). La publishable/anon key es pública y segura en el cliente.
       SUPABASE_URL: process.env.SUPABASE_URL || "",
       SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY || "",
