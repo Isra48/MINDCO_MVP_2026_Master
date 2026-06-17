@@ -85,6 +85,7 @@ API ID singular: `carrousel` · plural: `carrousels`. (Son las tarjetas de desti
 | `title` | Text (short) |
 | `link` | Text (short) — URL |
 | `image` | Media (single, images) |
+| `isVisible` | Boolean | default `true` — `false` oculta ese item del carrusel (la app filtra con `filters[isVisible][$eq]=true`) |
 
 Crea **3 entradas** y publícalas:
 1. title: "Baja Sur" · link: "https://mindco.app/baja-sur"
@@ -92,6 +93,27 @@ Crea **3 entradas** y publícalas:
 3. title: "Mexico City" · link: "https://mindco.app/cdmx"
 
 Sube la imagen de **`assets/strapi-seed/`** para cada una (`destino-baja-sur.jpg`, `destino-monterrey.jpg`, `destino-mexico-city.jpg`).
+
+### 3.1) Single Type: `Reto del mes`  → endpoint `/api/reto-del-mes`
+> Es la **isla emergente** que aparece arriba del Hero en el Home (la "card de challenge del mes"
+> con animación de entrada). La app la oculta automáticamente si `active` es `false` o no hay `title`.
+
+API ID singular: `reto-del-mes` · plural: `retos-del-mes`. (Debe ser **Single Type**: la app lee el objeto directo, no `data[0]`.) Campos:
+| Campo | Tipo | Notas |
+|-------|------|-------|
+| `badge` | Text (short) | eyebrow, ej. "Challenge del mes" |
+| `icon` | Text (short) | nombre de icono Feather, ej. `target` |
+| `title` | Text (short) | título del reto |
+| `progressLabel` | Text (short) | ej. "0 de 5 completadas" (opcional) |
+| `url` | Text (short) | link externo del reto (opcional) |
+| `active` | Boolean | default `true` — `false` **oculta** la isla del Home |
+
+Rellena la entrada y **publícala** (sin publicar, la API devuelve `null` y la isla no aparece):
+- badge: "Challenge del mes"
+- icon: "target"
+- title: "Reto de este mes: 5 clases"
+- progressLabel: "0 de 5 completadas"
+- active: true
 
 ### 4) Single Type: `Login`  → endpoint `/api/login`
 > Nota: el inicio de sesión/registro **real** ahora es con **Supabase**. Este single type solo
@@ -130,13 +152,14 @@ Ve a **Settings → API Tokens → Create new API Token**:
 - Guarda y **copia el token** (solo se muestra una vez). Ese valor va en `STRAPI_API_TOKEN`.
 
 (Alternativa sin token: Settings → Roles → **Public** → habilita `find` y `findOne` en class, home,
-carrousel, login y register. Pero lo recomendado es el token read-only.)
+carrousel, reto-del-mes, login y register. Pero lo recomendado es el token read-only.)
 
 ### 7) Verificación final
 Confirma que estos endpoints devuelven datos publicados (reemplaza `<URL>` por la URL del proyecto):
 - `<URL>/api/classes?populate=image`
 - `<URL>/api/homes`
-- `<URL>/api/carrousels?populate=image`
+- `<URL>/api/carrousels?populate=image` (cada item debe incluir `isVisible`)
+- `<URL>/api/reto-del-mes` (debe responder 200 con la entrada publicada, no 404)
 - `<URL>/api/login?populate=*`
 - `<URL>/api/register?populate=*`
 
