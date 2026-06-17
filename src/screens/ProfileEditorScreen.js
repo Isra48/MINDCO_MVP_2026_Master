@@ -20,6 +20,7 @@ import TextField from "../components/common/TextField";
 import PrimaryButton from "../components/buttons/PrimaryButton";
 import colors from "../constants/colors";
 import { getUser, setUser } from "../utils/storage";
+import { useAuth } from "../context/AuthContext";
 import { globalStyles } from "../styles/globalStyles";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import PhoneInput from "react-native-phone-number-input";
@@ -29,6 +30,7 @@ import { Feather } from "@expo/vector-icons";
 const KEYBOARD_ACCESSORY_ID = "profileKeyboardAccessory";
 
 export default function ProfileEditorScreen({ navigation }) {
+  const { refreshProfile } = useAuth();
   const [name, setName] = useState("");
   const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
@@ -168,6 +170,9 @@ export default function ProfileEditorScreen({ navigation }) {
       avatar: avatarUri,
     });
 
+    // Sincroniza el estado de auth: ahora el perfil está completo, así el gating
+    // de navegación (hasProfile) no queda obsoleto.
+    await refreshProfile();
     navigation.reset({ index: 0, routes: [{ name: "Home" }] });
   };
 
