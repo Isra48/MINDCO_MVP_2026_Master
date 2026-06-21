@@ -1,0 +1,44 @@
+{
+  "cli": {
+    "version": ">= 12.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal",
+      "environment": "preview",
+      "ios": {
+        "simulator": false
+      },
+      "env": {
+        "CONTENT_SOURCE": "strapi",
+        "CONTENT_PREVIEW_MODE": "false",
+        "CONTENT_CACHE_HOURS": "6",
+        "DEV_SKIP_AUTH": "false",
+        "SUPABASE_URL": "https://yfllqmjckarjbxxujdqg.supabase.co",
+        "SUPABASE_ANON_KEY": "sb_publishable_bnkYktNKxwk2EEMqSFa1qA_aaBPXgUp",
+        "STRAPI_URL": "https://useful-vacation-fcb17b63ff.strapiapp.com"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "environment": "production",
+      "env": {
+        "CONTENT_SOURCE": "strapi",
+        "CONTENT_PREVIEW_MODE": "false",
+        "CONTENT_CACHE_HOURS": "6",
+        "DEV_SKIP_AUTH": "false",
+        "SUPABASE_URL": "https://yfllqmjckarjbxxujdqg.supabase.co",
+        "SUPABASE_ANON_KEY": "sb_publishable_bnkYktNKxwk2EEMqSFa1qA_aaBPXgUp",
+        "STRAPI_URL": "https://useful-vacation-fcb17b63ff.strapiapp.com"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
