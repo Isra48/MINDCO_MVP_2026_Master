@@ -115,12 +115,13 @@ export default function RegisterScreen({ navigation }) {
       )}
       <View style={styles.loginOverlay} />
 
-      <ScrollView
-        contentContainerStyle={styles.loginContent}
-        keyboardShouldPersistTaps="handled"
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        <ScrollView
+          contentContainerStyle={styles.loginContent}
+          keyboardShouldPersistTaps="handled"
         >
           <View style={styles.loginWrapper}>
             {/* HEADER */}
@@ -183,8 +184,8 @@ export default function RegisterScreen({ navigation }) {
           </TouchableOpacity>
         </View>
           </View>
-        </KeyboardAvoidingView>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
 
   );

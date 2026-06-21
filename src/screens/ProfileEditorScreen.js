@@ -20,6 +20,7 @@ import TextField from "../components/common/TextField";
 import PrimaryButton from "../components/buttons/PrimaryButton";
 import colors from "../constants/colors";
 import { getUser, setUser } from "../utils/storage";
+import { useAuth } from "../context/AuthContext";
 import { globalStyles } from "../styles/globalStyles";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import PhoneInput from "react-native-phone-number-input";
@@ -29,11 +30,14 @@ import { Feather } from "@expo/vector-icons";
 const KEYBOARD_ACCESSORY_ID = "profileKeyboardAccessory";
 
 export default function ProfileEditorScreen({ navigation }) {
+  const { refreshProfile } = useAuth();
   const [name, setName] = useState("");
   const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
   const [birthDate, setBirthDate] = useState(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  // Borrador para el picker de iOS: solo se confirma al pulsar "Listo".
+  const [tempDate, setTempDate] = useState(null);
   const [avatarUri, setAvatarUri] = useState(null);
 
   const phoneInputRef = useRef(null);
@@ -72,18 +76,32 @@ export default function ProfileEditorScreen({ navigation }) {
 
   const openDatePicker = () => {
     Keyboard.dismiss();
+    // Sembramos el borrador con la fecha actual (o un valor por defecto válido).
+    setTempDate(birthDate || new Date(2000, 0, 1));
     setShowDatePicker(true);
   };
   const closeDatePicker = () => setShowDatePicker(false);
 
-  const onChangeDate = (_, selectedDate) => {
-    if (Platform.OS === "android") {
-      closeDatePicker();
-    }
-
+  // Android: el diálogo nativo confirma/cancela por sí mismo.
+  const onChangeAndroidDate = (_, selectedDate) => {
+    closeDatePicker();
     if (selectedDate) {
       setBirthDate(selectedDate);
     }
+  };
+
+  // iOS: el spinner solo actualiza el borrador; se confirma con "Listo".
+  const onChangeIosDate = (_, selectedDate) => {
+    if (selectedDate) {
+      setTempDate(selectedDate);
+    }
+  };
+
+  const confirmIosDate = () => {
+    if (tempDate) {
+      setBirthDate(tempDate);
+    }
+    closeDatePicker();
   };
 
   // Selección de foto: galería o cámara. Funciona sin backend (uri local).
@@ -168,6 +186,9 @@ export default function ProfileEditorScreen({ navigation }) {
       avatar: avatarUri,
     });
 
+    // Sincroniza el estado de auth: ahora el perfil está completo, así el gating
+    // de navegación (hasProfile) no queda obsoleto.
+    await refreshProfile();
     navigation.reset({ index: 0, routes: [{ name: "Home" }] });
   };
 
@@ -278,7 +299,7 @@ export default function ProfileEditorScreen({ navigation }) {
               value={birthDate || new Date(2000, 0, 1)}
               mode="date"
               maximumDate={maxDate}
-              onChange={onChangeDate}
+              onChange={onChangeAndroidDate}
               textColor={colors.darkText}
               themeVariant="light"
             />
@@ -296,23 +317,37 @@ export default function ProfileEditorScreen({ navigation }) {
                 <Pressable style={styles.backdrop} onPress={closeDatePicker} />
 
                 <View style={styles.iosPickerContainer}>
+                  <View style={styles.iosPickerHeader}>
+                    <TouchableOpacity
+                      onPress={closeDatePicker}
+                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
+                      <Text style={styles.iosPickerCancelText}>Cancelar</Text>
+                    </TouchableOpacity>
+
+                    <Text style={styles.iosPickerTitle}>
+                      Fecha de nacimiento
+                    </Text>
+
+                    <TouchableOpacity
+                      onPress={confirmIosDate}
+                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
+                      <Text style={styles.iosPickerDoneText}>Listo</Text>
+                    </TouchableOpacity>
+                  </View>
+
                   <DateTimePicker
-                    value={birthDate || new Date(2000, 0, 1)}
+                    value={tempDate || new Date(2000, 0, 1)}
                     mode="date"
                     display="spinner"
+                    locale="es-MX"
                     maximumDate={maxDate}
-                    onChange={onChangeDate}
+                    onChange={onChangeIosDate}
                     textColor={colors.darkText}
                     themeVariant="light"
                     style={styles.iosPicker}
                   />
-
-                  <TouchableOpacity
-                    style={styles.iosPickerDone}
-                    onPress={closeDatePicker}
-                  >
-                    <Text style={styles.iosPickerDoneText}>Listo</Text>
-                  </TouchableOpacity>
                 </View>
               </View>
             </Modal>
@@ -326,7 +361,10 @@ export default function ProfileEditorScreen({ navigation }) {
       {Platform.OS === "ios" && (
         <InputAccessoryView nativeID={KEYBOARD_ACCESSORY_ID}>
           <View style={styles.accessory}>
-            <TouchableOpacity onPress={() => Keyboard.dismiss()}>
+            <TouchableOpacity
+              onPress={() => Keyboard.dismiss()}
+              hitSlop={{ top: 12, bottom: 12, left: 16, right: 16 }}
+            >
               <Text style={styles.accessoryText}>Listo</Text>
             </TouchableOpacity>
           </View>
@@ -427,21 +465,34 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF", // fijo
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
-    paddingBottom: 12,
+    paddingBottom: 24,
     width: "100%",
     alignSelf: "center",
-    alignItems: "center",
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 8,
   },
+  iosPickerHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.lightGray,
+  },
+  iosPickerTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: colors.darkText,
+  },
+  iosPickerCancelText: {
+    color: colors.gray,
+    fontSize: 16,
+  },
   iosPicker: {
     width: "100%",
     alignSelf: "stretch",
-  },
-  iosPickerDone: {
-    alignItems: "center",
-    paddingVertical: 10,
   },
   iosPickerDoneText: {
     color: colors.primary,
